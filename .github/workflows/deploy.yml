@@ -1,4 +1,4 @@
-name: Deploy to Namecheap Staging
+name: Deploy to Namecheap
 
 on:
   push:
@@ -7,11 +7,19 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Deployment triggered
-      run: |
-        echo "✅ Deployment triggered successfully at $(date)"
+
+    - name: Deploy via FTP to Namecheap
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: server348.web-hosting.com
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /public_html/wpcomstaging/wp-content/themes/apex-theme/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**

@@ -38,6 +38,7 @@
                 <li><a href="<?php echo home_url('/'); ?>">Home</a></li>
                 <li><a href="<?php echo home_url('/products'); ?>">Products</a></li>
                 <li><a href="<?php echo home_url('/pmags'); ?>">PMAGs</a></li>
+                <li><a href="<?php echo home_url('/1911-grips'); ?>">1911 Grips</a></li>
                 <li><a href="<?php echo home_url('/services'); ?>">Services</a></li>
                 <li><a href="<?php echo home_url('/gallery'); ?>">Gallery</a></li>
                 <li><a href="<?php echo home_url('/heroes'); ?>" style="color:var(--apex-gold);">🎖️ Heroes</a></li>

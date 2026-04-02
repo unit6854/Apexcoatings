@@ -485,7 +485,7 @@
                 ],
                 [
                     'title' => 'Quality Guaranteed',
-                    'desc'  => 'Not satisfied? We make it right. Our work is backed by our reputation and our word. Every job is inspected before it leaves our shop.',
+                    'desc'  => 'At APEX, we set the standard for others to follow. Sub-par work never leaves our shop. If your project isn\'t right, you don\'t pay. If it can\'t be fixed, we replace it. No exceptions, no excuses — just accountability and craftsmanship.',
                     'icon'  => '<polyline points="20 6 9 17 4 12"/>',
                 ],
             ];
