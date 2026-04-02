@@ -182,6 +182,8 @@ uksort($by_cat, function($a, $b) {
         document.querySelectorAll('.gallery-item video').forEach(function(vid) {
             videoObs.observe(vid);
         });
+        // Prevent memory leak — disconnect when page unloads
+        window.addEventListener('beforeunload', function () { videoObs.disconnect(); }, { once: true });
     } else {
         // Fallback: load and play all (old browsers)
         document.querySelectorAll('.gallery-item video').forEach(function(vid) {

@@ -164,7 +164,7 @@ function apex_seo_meta() {
     $site_name  = 'Apex Coatings & Engraving';
     $site_url   = 'https://apexcoatingstn.com';
     $theme_uri  = get_template_directory_uri();
-    $og_image   = $theme_uri . '/assets/images/apex-logo-hero.png';
+    $og_image   = $theme_uri . '/assets/images/apex-logo-hero.webp';
     $canonical  = esc_url( get_permalink() ?: home_url('/') );
 
     // Per-page title and description
@@ -270,8 +270,8 @@ function apex_seo_meta() {
         'telephone'          => '+16158621660',
         'email'              => 'orders@apexcoatingstn.com',
         'url'                => $site_url,
-        'logo'               => $theme_uri . '/assets/images/apex-logo-hero.png',
-        'image'              => $theme_uri . '/assets/images/apex-logo-hero.png',
+        'logo'               => $theme_uri . '/assets/images/apex-logo-hero.webp',
+        'image'              => $theme_uri . '/assets/images/apex-logo-hero.webp',
         'priceRange'         => '$$',
         'currenciesAccepted' => 'USD',
         'paymentAccepted'    => 'Cash, Check',

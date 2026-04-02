@@ -16,7 +16,7 @@
           type="image/webp" fetchpriority="high">
     <?php if ( is_front_page() ): ?>
     <link rel="preload" as="image"
-          href="<?php echo esc_url(get_template_directory_uri() . '/assets/images/apex-logo-hero.png'); ?>"
+          href="<?php echo esc_url(get_template_directory_uri() . '/assets/images/apex-logo-hero.webp'); ?>"
           fetchpriority="high">
     <?php endif; ?>
 

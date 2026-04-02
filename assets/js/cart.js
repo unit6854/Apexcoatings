@@ -177,6 +177,8 @@
                 });
             });
             observer.observe(productsGrid, { childList: true, subtree: true });
+            // Prevent memory leak — disconnect when page unloads
+            window.addEventListener('beforeunload', function () { observer.disconnect(); }, { once: true });
         }
     });
 

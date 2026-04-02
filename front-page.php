@@ -15,7 +15,7 @@
             <!-- Glowing APEX logo above title -->
             <div class="hero-logo-wrap">
                 <div class="hero-logo-glow"></div>
-                <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/apex-logo-hero.png'); ?>"
+                <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/apex-logo-hero.webp'); ?>"
                      alt="Apex Coatings &amp; Engraving"
                      class="hero-logo-img"
                      loading="eager">
@@ -299,7 +299,7 @@
      ============================================================ -->
 <section style="background:#111;padding:80px 0;overflow:hidden;">
     <div class="container">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
+        <div id="pmag-feature-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
 
             <!-- Image -->
             <div class="reveal" style="position:relative;border-radius:10px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
@@ -350,16 +350,6 @@
     </div>
 </section>
 
-<!-- Mobile stack fix for PMAG section -->
-<style>
-@media (max-width: 768px) {
-    #pmag-feature-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
-}
-</style>
-<script>
-document.querySelector('section[style*="background:#111"] .container > div') &&
-    document.querySelector('section[style*="background:#111"] .container > div').setAttribute('id','pmag-feature-grid');
-</script>
 
 <!-- ============================================================
      PROCESS SECTION
