@@ -1,0 +1,21 @@
+{
+  "name": "Apex Coatings & Engraving",
+  "short_name": "Apex Coatings",
+  "description": "Premium Cerakote finishing, custom engraving, and laser engraving in Nashville, TN.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#1A1A1A",
+  "theme_color": "#F5831F",
+  "icons": [
+    {
+      "src": "/wp-content/themes/apex-theme/assets/images/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/wp-content/themes/apex-theme/assets/images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
