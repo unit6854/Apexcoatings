@@ -18,7 +18,7 @@ jobs:
         server: server348.web-hosting.com
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /public_html/wpcomstaging/wp-content/themes/apex-theme/
+        server-dir: /public_html/staging/wp-content/themes/apex-theme/
         exclude: |
           **/.git*
           **/.git*/**
