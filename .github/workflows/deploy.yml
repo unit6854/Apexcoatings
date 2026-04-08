@@ -12,13 +12,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Deploy via FTP to Namecheap
+    - name: Deploy theme via FTP to Namecheap (live)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: server348.web-hosting.com
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /public_html/staging/wp-content/themes/apex-theme/
+        local-dir: "./Local Sites/apex-coatings-and-engraving/app/public/wp-content/themes/apex-block-theme/"
+        server-dir: /public_html/wp-content/themes/apex-block-theme/
         exclude: |
           **/.git*
           **/.git*/**

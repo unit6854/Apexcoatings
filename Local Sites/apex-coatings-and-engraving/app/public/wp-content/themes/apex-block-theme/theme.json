@@ -1,0 +1,140 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 2,
+  "settings": {
+    "appearanceTools": true,
+    "useRootPaddingAwareAlignments": true,
+    "color": {
+      "custom": true,
+      "customGradient": true,
+      "defaultPalette": false,
+      "defaultGradients": false,
+      "palette": [
+        { "name": "Primary (Orange)",    "slug": "primary",       "color": "#F5831F" },
+        { "name": "Primary Deep",        "slug": "primary-deep",  "color": "#E06510" },
+        { "name": "Secondary (Gold)",    "slug": "secondary",     "color": "#FFAD00" },
+        { "name": "Base (Black)",        "slug": "base",          "color": "#1A1A1A" },
+        { "name": "Base Dark",           "slug": "base-dark",     "color": "#111111" },
+        { "name": "White",               "slug": "white",         "color": "#FFFFFF" },
+        { "name": "Off White",           "slug": "off-white",     "color": "#F5F5F5" },
+        { "name": "Gray Light",          "slug": "gray-light",    "color": "#E8E8E8" },
+        { "name": "Gray Mid",            "slug": "gray-mid",      "color": "#AAAAAA" },
+        { "name": "Gray Dark",           "slug": "gray-dark",     "color": "#444444" }
+      ],
+      "gradients": [
+        {
+          "name": "Apex Gradient",
+          "slug": "apex-gradient",
+          "gradient": "linear-gradient(135deg, #FFAD00 0%, #F5831F 60%, #E06510 100%)"
+        },
+        {
+          "name": "Apex Gradient Reverse",
+          "slug": "apex-gradient-rev",
+          "gradient": "linear-gradient(135deg, #E06510 0%, #F5831F 60%, #FFAD00 100%)"
+        },
+        {
+          "name": "Apex Dark Gradient",
+          "slug": "apex-dark-gradient",
+          "gradient": "linear-gradient(135deg, #1A1A1A 0%, #2a2a2a 100%)"
+        }
+      ]
+    },
+    "typography": {
+      "customFontSize": true,
+      "defaultFontSizes": false,
+      "fontFamilies": [
+        {
+          "name": "Heading (Barlow Condensed)",
+          "slug": "heading",
+          "fontFamily": "'Barlow Condensed', Impact, 'Arial Black', sans-serif"
+        },
+        {
+          "name": "Body (Barlow)",
+          "slug": "body",
+          "fontFamily": "'Barlow', 'Helvetica Neue', Arial, sans-serif"
+        }
+      ],
+      "fontSizes": [
+        { "name": "Small",        "slug": "small",        "size": "0.875rem" },
+        { "name": "Normal",       "slug": "normal",       "size": "1rem" },
+        { "name": "Medium",       "slug": "medium",       "size": "1.1rem" },
+        { "name": "Large",        "slug": "large",        "size": "1.5rem" },
+        { "name": "X-Large",      "slug": "x-large",      "size": "2rem" },
+        { "name": "XX-Large",     "slug": "xx-large",     "size": "clamp(2rem, 5vw, 3.5rem)" },
+        { "name": "Hero",         "slug": "hero",         "size": "clamp(2.8rem, 6vw, 5rem)" }
+      ]
+    },
+    "spacing": {
+      "custom": true,
+      "defaultSpacingSizes": false,
+      "spacingSizes": [
+        { "name": "Section Pad",    "slug": "section-pad",    "size": "80px" },
+        { "name": "Section Pad LG", "slug": "section-pad-lg", "size": "120px" },
+        { "name": "Container",      "slug": "container",      "size": "1200px" }
+      ],
+      "units": ["px", "%", "em", "rem", "vw", "vh"]
+    },
+    "layout": {
+      "contentSize": "1200px",
+      "wideSize": "1400px"
+    },
+    "border": {
+      "custom": true,
+      "defaultRadius": false,
+      "radius": true
+    },
+    "shadow": {
+      "defaultPresets": false,
+      "presets": [
+        { "name": "Card Shadow",   "slug": "card",   "shadow": "0 4px 24px rgba(0,0,0,0.12)" },
+        { "name": "Heavy Shadow",  "slug": "heavy",  "shadow": "0 8px 40px rgba(0,0,0,0.25)" },
+        { "name": "Orange Shadow", "slug": "orange", "shadow": "0 4px 24px rgba(245,131,31,0.3)" }
+      ]
+    },
+    "custom": {
+      "transition":      "0.25s ease",
+      "transition-slow": "0.4s ease"
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#FFFFFF",
+      "text":       "#1A1A1A"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--body)",
+      "fontSize":   "1rem",
+      "lineHeight": "1.65"
+    },
+    "elements": {
+      "link": {
+        "color": { "text": "var(--wp--preset--color--primary)" },
+        ":hover": {
+          "color": { "text": "var(--wp--preset--color--primary-deep)" }
+        }
+      },
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--heading)",
+          "fontWeight": "800",
+          "lineHeight": "1.15"
+        }
+      }
+    },
+    "css": ":root { --apex-black: var(--wp--preset--color--base); --apex-dark: var(--wp--preset--color--base-dark); --apex-orange: var(--wp--preset--color--primary); --apex-orange-deep: var(--wp--preset--color--primary-deep); --apex-gold: var(--wp--preset--color--secondary); --apex-white: var(--wp--preset--color--white); --apex-off-white: var(--wp--preset--color--off-white); --apex-gray-light: var(--wp--preset--color--gray-light); --apex-gray-mid: var(--wp--preset--color--gray-mid); --apex-gray-dark: var(--wp--preset--color--gray-dark); --apex-gradient: var(--wp--preset--gradient--apex-gradient); --apex-gradient-rev: var(--wp--preset--gradient--apex-gradient-rev); --apex-dark-gradient: var(--wp--preset--gradient--apex-dark-gradient); --font-heading: var(--wp--preset--font-family--heading); --font-body: var(--wp--preset--font-family--body); --section-pad: 80px; --container: 1200px; --shadow-card: 0 4px 24px rgba(0,0,0,0.12); --shadow-heavy: 0 8px 40px rgba(0,0,0,0.25); --shadow-orange: 0 4px 24px rgba(245,131,31,0.3); --trans: var(--wp--custom--transition); --trans-slow: var(--wp--custom--transition-slow); }"
+  },
+  "templateParts": [
+    { "name": "header", "title": "Header", "area": "header" },
+    { "name": "footer", "title": "Footer", "area": "footer" }
+  ],
+  "customTemplates": [
+    { "name": "front-page", "title": "Front Page", "postTypes": ["page"] },
+    { "name": "page-products", "title": "Products Page", "postTypes": ["page"] },
+    { "name": "page-cart", "title": "Cart Page", "postTypes": ["page"] },
+    { "name": "page-checkout", "title": "Checkout Page", "postTypes": ["page"] },
+    { "name": "page-contact", "title": "Contact Page", "postTypes": ["page"] },
+    { "name": "page-gallery", "title": "Gallery Page", "postTypes": ["page"] },
+    { "name": "page-services", "title": "Services Page", "postTypes": ["page"] },
+    { "name": "page-heroes", "title": "Heroes Discount Page", "postTypes": ["page"] }
+  ]
+}

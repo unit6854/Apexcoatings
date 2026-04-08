@@ -1,0 +1,54 @@
+<!-- wp:template-part {"slug":"header","tagName":"header","theme":"apex-block-theme"} /-->
+<!-- wp:html -->
+<?php
+global $post;
+if ( $post ) {
+    $pid      = $post->ID;
+    $price    = get_post_meta( $pid, '_apex_price', true );
+    $material = get_post_meta( $pid, '_apex_material', true );
+    $in_stock = get_post_meta( $pid, '_apex_in_stock', true );
+    $sku      = get_post_meta( $pid, '_apex_sku', true );
+}
+?>
+<main class="page-wrap" style="padding:120px 0 80px;min-height:70vh;background:var(--apex-off-white);">
+    <div class="container">
+        <a href="/products" class="page-back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back to Products
+        </a>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:24px;">
+            <div>
+                <?php if ( $post && has_post_thumbnail( $post ) ): ?>
+                <?php echo get_the_post_thumbnail( $post, 'large', [ 'style' => 'width:100%;height:auto;border-radius:8px;display:block;', 'loading' => 'eager' ] ); ?>
+                <?php endif; ?>
+            </div>
+            <div>
+                <?php if ( $post && $in_stock === '1' ): ?>
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#38a169;background:rgba(56,161,105,0.1);border:1px solid rgba(56,161,105,0.3);padding:4px 12px;border-radius:50px;display:inline-block;margin-bottom:16px;">In Stock</span>
+                <?php elseif ( $post ): ?>
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#e53e3e;background:rgba(229,62,62,0.08);border:1px solid rgba(229,62,62,0.2);padding:4px 12px;border-radius:50px;display:inline-block;margin-bottom:16px;">Quote Only</span>
+                <?php endif; ?>
+                <h1 class="page-title"><?php echo $post ? get_the_title( $post ) : ''; ?></h1>
+                <?php if ( $post && $material ): ?>
+                <p style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--apex-gray-mid);margin:8px 0 16px;"><?php echo esc_html($material); ?></p>
+                <?php endif; ?>
+                <?php if ( $post && $price ): ?>
+                <div class="card-price" style="margin-bottom:24px;">
+                    <span class="price-amount">$<?php echo number_format(floatval($price),0); ?></span>
+                    <span class="price-label">starting at</span>
+                </div>
+                <?php endif; ?>
+                <div style="color:var(--apex-gray-dark);line-height:1.75;margin-bottom:32px;"><?php echo $post ? apply_filters('the_content', get_the_content(null, false, $post)) : ''; ?></div>
+                <?php if ( $post && $sku ): ?>
+                <p style="font-size:0.85rem;color:var(--apex-gray-mid);margin-bottom:24px;">SKU: <?php echo esc_html($sku); ?></p>
+                <?php endif; ?>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <a href="/contact" class="btn btn-primary" style="justify-content:center;">Request Quote</a>
+                    <a href="/contact" class="btn btn-outline-dark" style="justify-content:center;">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- /wp:html -->
+<!-- wp:template-part {"slug":"footer","tagName":"footer","theme":"apex-block-theme"} /-->
