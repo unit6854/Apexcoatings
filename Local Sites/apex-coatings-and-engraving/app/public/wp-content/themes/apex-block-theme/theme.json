@@ -116,7 +116,6 @@
       "heading": {
         "typography": {
           "fontFamily": "var(--wp--preset--font-family--heading)",
-          "fontWeight": "800",
           "lineHeight": "1.15"
         }
       }
