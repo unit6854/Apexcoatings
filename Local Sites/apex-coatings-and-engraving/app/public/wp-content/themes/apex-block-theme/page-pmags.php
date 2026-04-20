@@ -5,49 +5,68 @@
  */
 get_header();
 
-$pmag_uri = get_template_directory_uri() . '/assets/images/pmags/';
-$pmag_dir = get_template_directory() . '/assets/images/pmags/';
+// ── Native WP post meta: pmag_gallery_ids ────────────────────────────────────
+// Populated via "PMAG Gallery Images" meta box when editing this page.
+// Stored as comma-separated attachment IDs. Each attachment's caption = card label.
+$pmag_ids = array_filter( explode( ',', (string) get_post_meta( get_the_ID(), 'pmag_gallery_ids', true ) ) );
 
-// Designs ordered newest-first (28 → 1), renumbered sequentially for display
-$designs = [
-    ['num' => 1,  'file' => 'pmag-design-33.webp',        'label' => 'Design #1'],
-    ['num' => 2,  'file' => 'pmag-design-32.webp',        'label' => 'Design #2'],
-    ['num' => 3,  'file' => 'pmag-design-31.webp',        'label' => 'Design #3'],
-    ['num' => 4,  'file' => 'pmag-design-30.webp',        'label' => 'Design #4'],
-    ['num' => 5,  'file' => 'pmag-design-29.webp',        'label' => 'Design #5'],
-    ['num' => 6,  'file' => 'pmag-design-28.webp',        'label' => 'Design #6'],
-    // Design #7 (pmag-design-27) removed — duplicate
-    ['num' => 7,  'file' => 'pmag-design-26.webp',        'label' => 'Design #7'],
-    // Design #9 (pmag-design-25) removed — duplicate
-    ['num' => 8,  'file' => 'pmag-design-24.webp',        'label' => 'Design #8'],
-    ['num' => 9,  'file' => 'pmag-design-23.webp',        'label' => 'Design #9'],
-    // Design #12 (pmag-design-22) removed — duplicate
-    // Design #13 (pmag-design-20-and-21) removed — duplicate
-    ['num' => 10, 'file' => 'pmag-design-19.webp',        'label' => 'Design #10'],
-    ['num' => 11, 'file' => 'pmag-design-18.webp',        'label' => 'Design #11'],
-    ['num' => 12, 'file' => 'pmag-design-17.webp',        'label' => 'Design #12'],
-    ['num' => 13, 'file' => 'pmag-design-16.webp',        'label' => 'Design #13'],
-    ['num' => 14, 'file' => 'pmag-design-15.webp',        'label' => 'Design #14'],
-    ['num' => 15, 'file' => 'pmag-design-14.webp',        'label' => 'Design #15'],
-    ['num' => 16, 'file' => 'pmag-design-13.webp',        'label' => 'Design #16'],
-    ['num' => 17, 'file' => 'pmag-design-12.webp',        'label' => 'Design #17'],
-    ['num' => 18, 'file' => 'pmag-design-11.webp',        'label' => 'Design #18'],
-    ['num' => 19, 'file' => 'pmag-design-10.webp',        'label' => 'Design #19'],
-    ['num' => 20, 'file' => 'pmag-design-9.webp',          'label' => 'Design #20'],
-    ['num' => 21, 'file' => 'pmag-design-8.webp',          'label' => 'Design #21'],
-    ['num' => 22, 'file' => 'pmag-design-7.webp',          'label' => 'Design #22'],
-    ['num' => 23, 'file' => 'pmag-design-6.webp',          'label' => 'Design #23'],
-    ['num' => 24, 'file' => 'pmag-design-5.webp',          'label' => 'Design #24'],
-    ['num' => 25, 'file' => 'pmag-design-4.webp',          'label' => 'Design #25'],
-    ['num' => 26, 'file' => 'pmag-design-3.webp',          'label' => 'Design #26'],
-    ['num' => 27, 'file' => 'pmag-design-2.webp',          'label' => 'Design #27'],
-    ['num' => 28, 'file' => 'pmag-design-1.webp',          'label' => 'Design #28'],
-];
+if ( ! empty( $pmag_ids ) ) {
+    $designs = [];
+    foreach ( $pmag_ids as $i => $att_id ) {
+        $att_id  = (int) $att_id;
+        $src     = wp_get_attachment_image_src( $att_id, 'full' );
+        if ( ! $src ) continue;
+        $num     = $i + 1;
+        $post    = get_post( $att_id );
+        $caption = $post ? trim( $post->post_excerpt ) : '';
+        $label   = $caption ?: 'Design #' . $num;
+        $designs[] = [
+            'num'     => $num,
+            'img_url' => $src[0],
+            'label'   => $label,
+        ];
+    }
+} else {
+    // Fallback: hardcoded file list so page is never blank before meta is populated
+    $pmag_uri = get_template_directory_uri() . '/assets/images/pmags/';
+    $pmag_dir = get_template_directory() . '/assets/images/pmags/';
 
-// Filter to only designs that actually have files
-$designs = array_values(array_filter($designs, function($d) use ($pmag_dir) {
-    return file_exists($pmag_dir . $d['file']);
-}));
+    $fallback_files = [
+        ['num' => 1,  'file' => 'pmag-design-33.webp', 'label' => 'Design #1'],
+        ['num' => 2,  'file' => 'pmag-design-32.webp', 'label' => 'Design #2'],
+        ['num' => 3,  'file' => 'pmag-design-31.webp', 'label' => 'Design #3'],
+        ['num' => 4,  'file' => 'pmag-design-30.webp', 'label' => 'Design #4'],
+        ['num' => 5,  'file' => 'pmag-design-29.webp', 'label' => 'Design #5'],
+        ['num' => 6,  'file' => 'pmag-design-28.webp', 'label' => 'Design #6'],
+        ['num' => 7,  'file' => 'pmag-design-26.webp', 'label' => 'Design #7'],
+        ['num' => 8,  'file' => 'pmag-design-24.webp', 'label' => 'Design #8'],
+        ['num' => 9,  'file' => 'pmag-design-23.webp', 'label' => 'Design #9'],
+        ['num' => 10, 'file' => 'pmag-design-19.webp', 'label' => 'Design #10'],
+        ['num' => 11, 'file' => 'pmag-design-18.webp', 'label' => 'Design #11'],
+        ['num' => 12, 'file' => 'pmag-design-17.webp', 'label' => 'Design #12'],
+        ['num' => 13, 'file' => 'pmag-design-16.webp', 'label' => 'Design #13'],
+        ['num' => 14, 'file' => 'pmag-design-15.webp', 'label' => 'Design #14'],
+        ['num' => 15, 'file' => 'pmag-design-14.webp', 'label' => 'Design #15'],
+        ['num' => 16, 'file' => 'pmag-design-13.webp', 'label' => 'Design #16'],
+        ['num' => 17, 'file' => 'pmag-design-12.webp', 'label' => 'Design #17'],
+        ['num' => 18, 'file' => 'pmag-design-11.webp', 'label' => 'Design #18'],
+        ['num' => 19, 'file' => 'pmag-design-10.webp', 'label' => 'Design #19'],
+        ['num' => 20, 'file' => 'pmag-design-9.webp',  'label' => 'Design #20'],
+        ['num' => 21, 'file' => 'pmag-design-8.webp',  'label' => 'Design #21'],
+        ['num' => 22, 'file' => 'pmag-design-7.webp',  'label' => 'Design #22'],
+        ['num' => 23, 'file' => 'pmag-design-6.webp',  'label' => 'Design #23'],
+        ['num' => 24, 'file' => 'pmag-design-5.webp',  'label' => 'Design #24'],
+        ['num' => 25, 'file' => 'pmag-design-4.webp',  'label' => 'Design #25'],
+        ['num' => 26, 'file' => 'pmag-design-3.webp',  'label' => 'Design #26'],
+        ['num' => 27, 'file' => 'pmag-design-2.webp',  'label' => 'Design #27'],
+        ['num' => 28, 'file' => 'pmag-design-1.webp',  'label' => 'Design #28'],
+    ];
+
+    $designs = array_values( array_filter( array_map( function( $d ) use ( $pmag_uri, $pmag_dir ) {
+        if ( ! file_exists( $pmag_dir . $d['file'] ) ) return null;
+        return [ 'num' => $d['num'], 'img_url' => $pmag_uri . $d['file'], 'label' => $d['label'] ];
+    }, $fallback_files ) ) );
+}
 ?>
 
 <!-- Page Hero -->
@@ -111,10 +130,10 @@ $designs = array_values(array_filter($designs, function($d) use ($pmag_dir) {
 
         <div class="pmag-grid" id="pmag-grid">
             <?php foreach ($designs as $design):
-                $img_url  = $pmag_uri . $design['file'];
-                $label    = $design['label'];
-                $num      = $design['num'];
-                $cart_id  = 'pmag-design-' . $num;
+                $img_url   = $design['img_url'];
+                $label     = $design['label'];
+                $num       = $design['num'];
+                $cart_id   = 'pmag-design-' . $num;
                 $cart_name = 'Custom PMAG Engraving — ' . $label;
             ?>
             <div class="pmag-card reveal" data-design="<?php echo esc_attr($cart_id); ?>">

@@ -9,6 +9,67 @@ if ( ! defined( 'ABSPATH' ) ) exit;
    SITE CONTENT SETTINGS PANEL
    ============================================================ */
 require_once get_template_directory() . '/inc/apex-settings.php';
+require_once get_template_directory() . '/inc/apex-acf-fields.php';
+
+/* ============================================================
+   FORCE PHP TEMPLATES — use template_include filter to guarantee
+   PHP templates run for specific slugs regardless of block theme
+   .html template assignments stored in the database.
+   ============================================================ */
+add_filter( 'template_include', 'apex_force_php_templates', 99 );
+function apex_force_php_templates( $template ) {
+    // Front page → front-page.php
+    if ( is_front_page() ) {
+        $php = locate_template( 'front-page.php' );
+        if ( $php ) return $php;
+    }
+
+    // Slug-based overrides for all custom pages
+    $slug_map = [
+        'pmags'      => 'page-pmags.php',
+        '1911-grips' => 'page-1911-grips.php',
+        'heroes'     => 'page-heroes.php',
+        'cart'       => 'page-cart.php',
+        'checkout'   => 'page-checkout.php',
+        'contact'    => 'page-contact.php',
+        'gallery'    => 'page-gallery.php',
+        'services'   => 'page-services.php',
+        'products'   => 'page-products.php',
+    ];
+
+    if ( is_page() ) {
+        $slug = get_post_field( 'post_name', get_queried_object_id() );
+        if ( isset( $slug_map[ $slug ] ) ) {
+            $php = locate_template( $slug_map[ $slug ] );
+            if ( $php ) return $php;
+        }
+    }
+
+    return $template;
+}
+
+// Also set _wp_page_template so ACF location rules match by template name
+add_action( 'init', 'apex_assign_php_templates' );
+function apex_assign_php_templates() {
+    $slug_to_template = [
+        'pmags'      => 'page-pmags.php',
+        '1911-grips' => 'page-1911-grips.php',
+        'heroes'     => 'page-heroes.php',
+        'cart'       => 'page-cart.php',
+        'checkout'   => 'page-checkout.php',
+        'contact'    => 'page-contact.php',
+        'gallery'    => 'page-gallery.php',
+        'services'   => 'page-services.php',
+        'products'   => 'page-products.php',
+    ];
+    foreach ( $slug_to_template as $slug => $template ) {
+        $page = get_page_by_path( $slug );
+        if ( ! $page ) continue;
+        if ( get_post_meta( $page->ID, '_wp_page_template', true ) !== $template ) {
+            update_post_meta( $page->ID, '_wp_page_template', $template );
+        }
+    }
+}
 
 /* ============================================================
    CONTENT WIDTH
