@@ -16,10 +16,11 @@ if ( $link_url ) {
     exit;
 }
 
-$price    = get_post_meta(get_the_ID(), '_apex_price', true);
-$sku      = get_post_meta(get_the_ID(), '_apex_sku', true);
-$material = get_post_meta(get_the_ID(), '_apex_material', true);
-$in_stock = get_post_meta(get_the_ID(), '_apex_in_stock', true);
+$price      = get_post_meta(get_the_ID(), '_apex_price', true);
+$sku        = get_post_meta(get_the_ID(), '_apex_sku', true);
+$material   = get_post_meta(get_the_ID(), '_apex_material', true);
+$in_stock   = get_post_meta(get_the_ID(), '_apex_in_stock', true);
+$quote_only = get_post_meta(get_the_ID(), '_apex_quote_only', true) === '1';
 $has_thumb = has_post_thumbnail();
 
 // Get gallery images from post content / ACF if available
@@ -100,8 +101,13 @@ $gallery_ids = get_post_meta(get_the_ID(), '_apex_gallery', true);
                     <?php the_content(); ?>
                 </div>
 
-                <!-- Add to Cart -->
+                <!-- Add to Cart / Request a Quote -->
                 <div style="display:flex;gap:14px;flex-wrap:wrap;">
+                    <?php if ($quote_only): ?>
+                    <a href="<?php echo esc_url( home_url('/contact') ); ?>" class="btn btn-primary" style="flex:1;min-width:180px;justify-content:center;">
+                        Request a Quote
+                    </a>
+                    <?php else: ?>
                     <button
                         class="add-to-cart-btn"
                         data-id="<?php the_ID(); ?>"
@@ -118,6 +124,7 @@ $gallery_ids = get_post_meta(get_the_ID(), '_apex_gallery', true);
                     <a href="<?php echo esc_url( home_url('/contact') ); ?>" class="btn btn-outline-dark" style="justify-content:center;">
                         Get a Custom Quote
                     </a>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Trust badges -->

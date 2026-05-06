@@ -45,6 +45,12 @@ function apex_force_php_templates( $template ) {
         }
     }
 
+    // Single apex_product → single-apex_product.php
+    if ( is_singular( 'apex_product' ) ) {
+        $php = locate_template( 'single-apex_product.php' );
+        if ( $php ) return $php;
+    }
+
     return $template;
 }
 
@@ -513,6 +519,13 @@ function apex_product_details_callback( $post ) {
             <strong>In Stock / Available</strong>
         </label>
     </p>
+    <?php $quote_only = get_post_meta( $post->ID, '_apex_quote_only', true ); ?>
+    <p>
+        <label>
+            <input type="checkbox" name="apex_quote_only" value="1" <?php checked($quote_only, '1'); ?>>
+            <strong>Quote Only</strong> (hides Add to Cart, shows Request a Quote)
+        </label>
+    </p>
     <?php
 }
 
@@ -526,7 +539,8 @@ function apex_save_product_meta( $post_id ) {
     if ( isset($_POST['apex_sku']) )      update_post_meta( $post_id, '_apex_sku',      sanitize_text_field( wp_unslash( $_POST['apex_sku'] ) ) );
     if ( isset($_POST['apex_material']) ) update_post_meta( $post_id, '_apex_material', sanitize_text_field( wp_unslash( $_POST['apex_material'] ) ) );
     if ( isset($_POST['apex_link_url']) ) update_post_meta( $post_id, '_apex_link_url', sanitize_text_field( wp_unslash( $_POST['apex_link_url'] ) ) );
-    update_post_meta( $post_id, '_apex_in_stock', isset($_POST['apex_in_stock']) ? '1' : '0' );
+    update_post_meta( $post_id, '_apex_in_stock',    isset($_POST['apex_in_stock'])    ? '1' : '0' );
+    update_post_meta( $post_id, '_apex_quote_only',  isset($_POST['apex_quote_only'])  ? '1' : '0' );
 }
 add_action( 'save_post_apex_product', 'apex_save_product_meta' );
 

@@ -69,9 +69,10 @@ $categories = get_terms(['taxonomy' => 'product_cat', 'hide_empty' => false]);
                 $in_stock = get_post_meta($pid, '_apex_in_stock', true);
                 $thumb_id = get_post_thumbnail_id($pid);
                 // Link-out override (e.g. PMAG → /pmags, 1911 Grips → /1911-grips)
-                $link_url = get_post_meta($pid, '_apex_link_url', true);
-                $card_url = $link_url ? home_url($link_url) : get_permalink($pid);
+                $link_url   = get_post_meta($pid, '_apex_link_url', true);
+                $card_url   = $link_url ? home_url($link_url) : get_permalink($pid);
                 $is_linkout = !empty($link_url);
+                $quote_only = get_post_meta($pid, '_apex_quote_only', true) === '1';
             ?>
             <div class="service-card reveal">
                 <div class="card-top-bar"></div>
@@ -102,7 +103,7 @@ $categories = get_terms(['taxonomy' => 'product_cat', 'hide_empty' => false]);
                         <a href="<?php echo esc_url($card_url); ?>" class="btn btn-outline-dark btn-sm" style="justify-content:center;">
                             <?php echo $is_linkout ? 'View Designs' : 'Details'; ?>
                         </a>
-                        <?php if (!$is_linkout): ?>
+                        <?php if (!$is_linkout && !$quote_only): ?>
                         <button class="add-to-cart-btn btn-sm"
                             data-id="<?php echo $pid; ?>"
                             data-name="<?php echo esc_attr(get_the_title($pid)); ?>"
@@ -113,6 +114,10 @@ $categories = get_terms(['taxonomy' => 'product_cat', 'hide_empty' => false]);
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                             Add to Cart
                         </button>
+                        <?php elseif ($quote_only): ?>
+                        <a href="<?php echo esc_url( home_url('/contact') ); ?>" class="btn btn-primary btn-sm" style="justify-content:center;">
+                            Request a Quote
+                        </a>
                         <?php else: ?>
                         <a href="<?php echo esc_url($card_url); ?>" class="btn btn-primary btn-sm" style="justify-content:center;">
                             Order Now

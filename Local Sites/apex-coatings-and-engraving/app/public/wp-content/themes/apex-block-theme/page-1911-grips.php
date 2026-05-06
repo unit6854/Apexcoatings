@@ -5,40 +5,27 @@
  */
 get_header();
 
-$grips_uri = get_template_directory_uri() . '/assets/images/1911-grips/';
-$grips_dir = get_template_directory() . '/assets/images/1911-grips/';
+// Load grip listings from admin-uploaded media (set via 1911 Grips page editor)
+$items_json = get_post_meta( get_the_ID(), 'grips_items_json', true );
+$grips_data = $items_json ? json_decode( $items_json, true ) : [];
+if ( ! is_array( $grips_data ) ) $grips_data = [];
 
-$grips = [
-    [
-        'file'  => 'black-cerakote-aluminum-reveal.webp',
-        'label' => apex_opt( 'grips_1_label', 'HEX Series Black Cerakote Aluminum Reveal' ),
-        'desc'  => apex_opt( 'grips_1_desc',  'Aluminum grip panels machined with a deep HEX pattern and finished in matte Black Cerakote — aggressive texture, zero compromise.' ),
-        'id'    => '1911-grips-black-cerakote-aluminum-reveal',
-    ],
-    [
-        'file'  => 'black-cerakote.webp',
-        'label' => apex_opt( 'grips_2_label', 'HEX Series Black Cerakote' ),
-        'desc'  => apex_opt( 'grips_2_desc',  'HEX-machined aluminum panels coated in clean, matte Black Cerakote. Hard-wearing, purpose-built, and made right here in-house.' ),
-        'id'    => '1911-grips-black-cerakote',
-    ],
-    [
-        'file'  => 'satin-aluminum.webp',
-        'label' => apex_opt( 'grips_3_label', 'HEX Series Satin Aluminum' ),
-        'desc'  => apex_opt( 'grips_3_desc',  'HEX-machined aluminum panels with a natural satin finish — understated, classic, and built to last a lifetime.' ),
-        'id'    => '1911-grips-satin-aluminum',
-    ],
-    [
-        'file'  => 'traditional-redwood.webp',
-        'label' => apex_opt( 'grips_4_label', 'Traditional Redwood' ),
-        'desc'  => apex_opt( 'grips_4_desc',  'Warm, classic redwood grip panels hand-fitted for a timeless look and feel.' ),
-        'id'    => '1911-grips-traditional-redwood',
-    ],
-];
-
-// Filter to only grips that actually have files
-$grips = array_values(array_filter($grips, function($g) use ($grips_dir) {
-    return file_exists($grips_dir . $g['file']);
-}));
+$grips = [];
+foreach ( $grips_data as $i => $item ) {
+    $att_id = (int) ( $item['id'] ?? 0 );
+    if ( ! $att_id ) continue;
+    $src = wp_get_attachment_image_src( $att_id, 'full' );
+    if ( ! $src ) continue;
+    $num     = $i + 1;
+    $grips[] = [
+        'num'     => $num,
+        'img_url' => $src[0],
+        'label'   => $item['label'] ?: 'Grip #' . $num,
+        'desc'    => $item['desc']  ?: '',
+        'price'   => $item['price'] ?: '90',
+        'id'      => '1911-grips-' . $num,
+    ];
+}
 ?>
 
 <!-- Page Hero -->
@@ -102,10 +89,11 @@ $grips = array_values(array_filter($grips, function($g) use ($grips_dir) {
 
         <div class="grips-grid" id="grips-grid">
             <?php foreach ($grips as $grip):
-                $img_url  = $grips_uri . $grip['file'];
-                $label    = $grip['label'];
-                $cart_id  = $grip['id'];
+                $img_url   = $grip['img_url'];
+                $label     = $grip['label'];
+                $cart_id   = $grip['id'];
                 $cart_name = '1911 Grip Panels — ' . $label;
+                $price     = (float) ( $grip['price'] ?: 90 );
             ?>
             <div class="grips-card reveal" data-grip="<?php echo esc_attr($cart_id); ?>">
 
@@ -125,14 +113,15 @@ $grips = array_values(array_filter($grips, function($g) use ($grips_dir) {
                 <div class="grips-card-body">
                     <div class="grips-card-top">
                         <span class="grips-name"><?php echo esc_html($label); ?></span>
-                        <span class="grips-price-tag">$90</span>
+                        <span class="grips-price-tag">$<?php echo esc_html( number_format( $price, 0 ) ); ?></span>
                     </div>
                     <p class="grips-card-desc"><?php echo esc_html($grip['desc']); ?></p>
 
                     <button class="btn btn-primary grips-add-btn"
                             onclick="apexGripsAddToCart('<?php echo esc_js($cart_id); ?>', '<?php echo esc_js($cart_name); ?>')"
                             data-id="<?php echo esc_attr($cart_id); ?>"
-                            data-name="<?php echo esc_attr($cart_name); ?>">
+                            data-name="<?php echo esc_attr($cart_name); ?>"
+                            data-price="<?php echo esc_attr($price); ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
                         Add to Cart
                     </button>
@@ -140,6 +129,12 @@ $grips = array_values(array_filter($grips, function($g) use ($grips_dir) {
             </div>
             <?php endforeach; ?>
         </div>
+
+        <?php if ( empty( $grips ) ) : ?>
+        <div style="text-align:center;padding:60px 40px;color:rgba(255,255,255,0.4);">
+            <p style="font-size:1.1rem;">Grip listings coming soon — check back after we upload our designs.</p>
+        </div>
+        <?php endif; ?>
 
         <!-- Custom / Expanding CTA -->
         <div class="grips-custom-cta">
@@ -389,7 +384,8 @@ function apexGripsAddToCart(id, name) {
         }
     }
 
-    window.ApexCart.addItem({ id: id, name: name, price: 90, desc: '1911 grip panels — custom finish', image: imgSrc, quantity: 1 });
+    var price = btn ? parseFloat(btn.dataset.price) || 90 : 90;
+    window.ApexCart.addItem({ id: id, name: name, price: price, desc: '1911 grip panels — custom finish', image: imgSrc, quantity: 1 });
 
     // Visual feedback on button
     if (btn) {

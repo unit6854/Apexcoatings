@@ -5,30 +5,25 @@
  */
 get_header();
 
-// Build image + video list from uploads/apex-gallery/
-$gallery_dir  = WP_CONTENT_DIR . '/uploads/apex-gallery/';
-$gallery_url  = content_url('/uploads/apex-gallery/');
+// Build image + video list from admin-uploaded media (set via Gallery page editor)
+$image_ids = array_filter( explode( ',', (string) get_post_meta( get_the_ID(), 'gallery_image_ids', true ) ) );
+$video_ids = array_filter( explode( ',', (string) get_post_meta( get_the_ID(), 'gallery_video_ids', true ) ) );
 
-$all_webp  = glob($gallery_dir . '*.webp') ?: [];
-$all_mp4   = glob($gallery_dir . '*.mp4')  ?: [];
-
-// Exclude WP-generated thumbnail variants and manually excluded duplicates, then sort newest file first
-$excluded = ['apex-ar-rifle-skull-spider-closeup-01.webp'];
-$image_files = array_values(array_filter($all_webp, function($f) use ($excluded) {
-    $base = basename($f);
-    return !preg_match('/-\d+x\d+\.webp$/', $base)
-        && !preg_match('/-scaled\.webp$/', $base)
-        && !in_array($base, $excluded);
-}));
-usort($image_files, function($a, $b) {
-    return filemtime($b) - filemtime($a); // newest first
-});
-
-// Merge: images first, then videos
-$all_media = array_merge(
-    array_map(fn($f) => ['file' => $f, 'type' => 'image'], $image_files),
-    array_map(fn($f) => ['file' => $f, 'type' => 'video'], $all_mp4)
-);
+$all_media = [];
+foreach ( $image_ids as $att_id ) {
+    $att_id = (int) $att_id;
+    $src    = wp_get_attachment_image_src( $att_id, 'full' );
+    if ( ! $src ) continue;
+    $file        = get_attached_file( $att_id );
+    $all_media[] = [ 'url' => $src[0], 'type' => 'image', 'filename' => $file ? basename( $file ) : basename( $src[0] ) ];
+}
+foreach ( $video_ids as $att_id ) {
+    $att_id = (int) $att_id;
+    $url    = wp_get_attachment_url( $att_id );
+    if ( ! $url ) continue;
+    $file        = get_attached_file( $att_id );
+    $all_media[] = [ 'url' => $url, 'type' => 'video', 'filename' => $file ? basename( $file ) : basename( $url ) ];
+}
 
 // Map slug-style filenames to human-readable labels
 function apex_gallery_label($filename) {
@@ -58,7 +53,7 @@ function apex_gallery_category($filename, $type = 'image') {
 // Group by category — videos always last
 $by_cat = [];
 foreach ($all_media as $item) {
-    $cat = apex_gallery_category(basename($item['file']), $item['type']);
+    $cat = apex_gallery_category($item['filename'], $item['type']);
     $by_cat[$cat][] = $item;
 }
 // Sort with Videos last
@@ -99,10 +94,9 @@ uksort($by_cat, function($a, $b) {
             <?php foreach ($by_cat as $cat => $items): ?>
                 <?php foreach ($items as $item): ?>
                 <?php
-                    $filepath = $item['file'];
                     $type     = $item['type'];
-                    $filename = basename($filepath);
-                    $url      = $gallery_url . $filename;
+                    $filename = $item['filename'];
+                    $url      = $item['url'];
                     $label    = apex_gallery_label($filename);
                     $cat_slug = sanitize_title($cat);
                 ?>

@@ -171,6 +171,17 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--apex-white);
 }
 
+.apex-btn-ghost {
+  background: rgba(255,255,255,0.07);
+  color: var(--apex-white);
+  border-color: rgba(255,255,255,0.45);
+}
+.apex-btn-ghost:hover {
+  background: rgba(255,255,255,0.16);
+  color: var(--apex-white);
+  border-color: rgba(255,255,255,0.7);
+}
+
 .btn-sm {
   padding: 10px 22px;
   font-size: 0.875rem;

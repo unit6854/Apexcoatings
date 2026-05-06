@@ -114,36 +114,28 @@ get_header();
         </div>
 
         <?php
-        $prod_uri = get_template_directory_uri() . '/assets/images/products/';
-        $prod_dir = get_template_directory() . '/assets/images/products/';
-        $all_imgs = glob($prod_dir . '*.webp');
-        if ($all_imgs):
-            $priority = [
-                'apex-ar-mag-officer-badge-bethesda-01.webp',
-                'apex-ar-mag-patrolman-michigan-city-badge-01.webp',
-                'apex-ar-mag-patrolman-michigan-city-badge-02.webp',
-                'apex-ar-mag-sheriff-montgomery-county-badge-01.webp',
-                'apex-ar-mag-fire-department-badge-01.webp',
-                'apex-ar-mag-dont-tread-on-me-snake-01.webp',
-                'apex-ar-mag-fafo-eagle-pair-01.webp',
-            ];
-            $show = [];
-            foreach ($priority as $p) {
-                if (file_exists($prod_dir . $p)) $show[] = $p;
-            }
-            foreach ($all_imgs as $img) {
-                if (count($show) >= 8) break;
-                $fn = basename($img);
-                if (!in_array($fn, $show)) $show[] = $fn;
+        $heroes_ids = array_filter( explode( ',', (string) get_post_meta( get_the_ID(), 'heroes_gallery_ids', true ) ) );
+        if ( ! empty( $heroes_ids ) ) :
+            $show_items = [];
+            foreach ( $heroes_ids as $att_id ) {
+                $att_id = (int) $att_id;
+                $src    = wp_get_attachment_image_url( $att_id, 'large' );
+                if ( ! $src ) continue;
+                $att_post = get_post( $att_id );
+                $label    = $att_post ? trim( $att_post->post_excerpt ) : '';
+                if ( ! $label ) {
+                    $file  = get_attached_file( $att_id );
+                    $fn    = $file ? pathinfo( $file, PATHINFO_FILENAME ) : '';
+                    $label = $fn ? ucwords( str_replace( [ '-', '_' ], ' ', preg_replace( '/^apex-|-\d+[a-z-]*$/', '', $fn ) ) ) : 'Gallery Image';
+                }
+                $show_items[] = [ 'url' => $src, 'label' => $label ];
             }
         ?>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
-            <?php foreach (array_slice($show, 0, 8) as $fn):
-                $label = ucwords(str_replace(['-','_'],' ', preg_replace('/^apex-|-\d+[a-z-]*$/','',$fn)));
-            ?>
+            <?php foreach ( $show_items as $item ) : ?>
             <div class="reveal" style="border-radius:8px;overflow:hidden;aspect-ratio:1;box-shadow:var(--shadow-card);">
-                <img src="<?php echo esc_url($prod_uri . $fn); ?>"
-                     alt="<?php echo esc_attr(trim($label)); ?>"
+                <img src="<?php echo esc_url( $item['url'] ); ?>"
+                     alt="<?php echo esc_attr( $item['label'] ); ?>"
                      class="heroes-gallery-img"
                      loading="lazy"
                      decoding="async">

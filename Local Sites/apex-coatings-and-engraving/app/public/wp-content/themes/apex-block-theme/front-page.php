@@ -190,7 +190,19 @@
                 $card_url  = $link_url ? home_url($link_url) : get_permalink($pid);
                 $is_linkout = !empty($link_url);
             ?>
-            <div class="service-card reveal" data-product-id="<?php the_ID(); ?>">
+            <?php
+                $modal_body = wp_strip_all_tags( get_the_content() ) ?: wp_strip_all_tags( get_the_excerpt() );
+                $modal_img  = get_the_post_thumbnail_url( $pid, 'large' ) ?: '';
+            ?>
+            <div class="service-card reveal"
+                 data-product-id="<?php the_ID(); ?>"
+                 data-modal-title="<?php echo esc_attr( get_the_title() ); ?>"
+                 data-modal-body="<?php echo esc_attr( $modal_body ); ?>"
+                 data-modal-price="<?php echo esc_attr( $price ); ?>"
+                 data-modal-img="<?php echo esc_attr( $modal_img ); ?>"
+                 data-modal-material="<?php echo esc_attr( $material ); ?>"
+                 data-modal-sku="<?php echo esc_attr( $sku ); ?>"
+                 data-modal-stock="<?php echo esc_attr( $in_stock ); ?>">
                 <div class="card-top-bar"></div>
 
                 <?php if ($has_thumb): ?>
@@ -233,7 +245,7 @@
 
                     <?php if ($is_linkout): ?>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto;">
-                        <a href="<?php echo esc_url($card_url); ?>" class="btn btn-outline-dark btn-sm" style="justify-content:center;">
+                        <a href="<?php echo esc_url($card_url); ?>" class="btn btn-sm btn-outline-dark" style="justify-content:center;">
                             View Designs
                         </a>
                         <a href="<?php echo esc_url($card_url); ?>" class="btn btn-primary btn-sm" style="justify-content:center;">
@@ -242,7 +254,7 @@
                     </div>
                     <?php else: ?>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto;">
-                        <a href="<?php echo esc_url( get_permalink($pid) ); ?>" class="btn btn-outline-dark btn-sm" style="justify-content:center;">View Details</a>
+                        <button type="button" class="btn btn-sm btn-outline-dark" onclick="apexOpenProductModal(this.closest('.service-card'))" style="justify-content:center;">View Details</button>
                         <a href="<?php echo esc_url( home_url('/contact') ); ?>" class="btn btn-primary btn-sm" style="justify-content:center;">Request Quote</a>
                     </div>
                     <?php endif; ?>
@@ -381,7 +393,7 @@
                     <?php endforeach; ?>
                 </ul>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <a href="<?php echo esc_url( home_url('/pmags') ); ?>" class="btn btn-outline-dark btn-sm" style="justify-content:center;">
+                    <a href="<?php echo esc_url( home_url('/pmags') ); ?>" class="btn btn-sm" style="justify-content:center;background:transparent;border:2px solid var(--apex-orange);color:var(--apex-orange);font-weight:700;letter-spacing:.06em;box-shadow:0 0 10px rgba(245,131,31,0.35);transition:background .2s,box-shadow .2s,color .2s;" onmouseover="this.style.background='rgba(245,131,31,0.15)';this.style.boxShadow='0 0 18px rgba(245,131,31,0.6)';" onmouseout="this.style.background='transparent';this.style.boxShadow='0 0 10px rgba(245,131,31,0.35)';">
                         View Designs
                     </a>
                     <a href="<?php echo esc_url( home_url('/pmags') ); ?>" class="btn btn-primary btn-sm" style="justify-content:center;">
@@ -459,53 +471,60 @@
 
         <div class="portfolio-grid reveal">
             <?php
-            $prod_dir = get_template_directory() . '/assets/images/products/';
-            $prod_uri = get_template_directory_uri() . '/assets/images/products/';
-            $all_imgs = glob($prod_dir . '*.webp');
-            // Pick 6 representative images
-            $picks = [
-                'apex-1911-floral-scroll-engraving-03-full.webp'      => ['Pistol Engraving',    '1911 Floral Scroll'],
-                'apex-ar-rifle-dont-tread-skull-mag-01.webp'           => ['Custom Engraving',    'AR-15 Don\'t Tread On Me'],
-                'apex-ar-mag-eagle-american-flag-01-set.webp'          => ['AR Magazine Art',     'Eagle & American Flag'],
-                'apex-ar-mag-punisher-thin-blue-line-01.webp'          => ['Laser Engraving',     'Thin Blue Line Punisher'],
-                'apex-ar-mag-skull-spider-01.webp'                     => ['Custom Artwork',      'Skull & Spider Design'],
-                'apex-1911-custom-wood-grips-01-full.webp'             => ['Custom 1911 Grips',   'Engraved Wood Grips'],
-            ];
-            foreach ($picks as $file => $meta):
-                $img_path = $prod_dir . $file;
-                if (!file_exists($img_path)) continue;
+            // Try WP-managed portfolio items first (set via "Recent Projects" meta box)
+            $portfolio_json  = get_post_meta( get_queried_object_id(), 'home_portfolio_json', true );
+            $portfolio_items = $portfolio_json ? json_decode( $portfolio_json, true ) : [];
+            $portfolio_items = is_array( $portfolio_items ) ? array_filter( $portfolio_items, function( $item ) {
+                return ! empty( $item['id'] ) && wp_get_attachment_image_src( (int) $item['id'], 'large' );
+            } ) : [];
+
+            if ( ! empty( $portfolio_items ) ):
+                foreach ( $portfolio_items as $item ):
+                    $att_id  = (int) $item['id'];
+                    $src     = wp_get_attachment_image_src( $att_id, 'large' );
+                    if ( ! $src ) continue;
             ?>
             <div class="portfolio-item">
-                <img src="<?php echo esc_url($prod_uri . $file); ?>"
-                     alt="<?php echo esc_attr($meta[1]); ?> — Apex Coatings &amp; Engraving"
+                <img src="<?php echo esc_url( $src[0] ); ?>"
+                     alt="<?php echo esc_attr( $item['name'] ?? '' ); ?> — Apex Coatings &amp; Engraving"
                      loading="lazy"
+                     width="<?php echo (int) $src[1]; ?>"
+                     height="<?php echo (int) $src[2]; ?>"
                      style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.5s ease;">
                 <div class="portfolio-overlay">
-                    <span class="portfolio-cat"><?php echo esc_html($meta[0]); ?></span>
-                    <span class="portfolio-name"><?php echo esc_html($meta[1]); ?></span>
+                    <span class="portfolio-cat"><?php echo esc_html( $item['cat'] ?? '' ); ?></span>
+                    <span class="portfolio-name"><?php echo esc_html( $item['name'] ?? '' ); ?></span>
                 </div>
             </div>
             <?php endforeach;
-            // If any picks are missing, fill with remaining images
-            $shown = count($picks);
-            if ($shown < 6 && $all_imgs):
-                foreach ($all_imgs as $img):
-                    if ($shown >= 6) break;
-                    $fn = basename($img);
-                    if (isset($picks[$fn])) continue;
-                    $label = ucwords(str_replace(['-','_'],' ', preg_replace('/^apex-|-\d+[a-z-]*$/', '', pathinfo($fn, PATHINFO_FILENAME))));
+
+            else:
+                // Fallback: show hardcoded theme images until WP items are configured
+                $prod_dir = get_template_directory() . '/assets/images/products/';
+                $prod_uri = get_template_directory_uri() . '/assets/images/products/';
+                $all_imgs = glob( $prod_dir . '*.webp' );
+                $picks = [
+                    'apex-1911-floral-scroll-engraving-03-full.webp' => ['Pistol Engraving',  '1911 Floral Scroll'],
+                    'apex-ar-rifle-dont-tread-skull-mag-01.webp'      => ['Custom Engraving',  'AR-15 Don\'t Tread On Me'],
+                    'apex-ar-mag-eagle-american-flag-01-set.webp'     => ['AR Magazine Art',   'Eagle & American Flag'],
+                    'apex-ar-mag-punisher-thin-blue-line-01.webp'     => ['Laser Engraving',   'Thin Blue Line Punisher'],
+                    'apex-ar-mag-skull-spider-01.webp'                => ['Custom Artwork',    'Skull & Spider Design'],
+                    'apex-1911-custom-wood-grips-01-full.webp'        => ['Custom 1911 Grips', 'Engraved Wood Grips'],
+                ];
+                foreach ( $picks as $file => $meta ):
+                    if ( ! file_exists( $prod_dir . $file ) ) continue;
             ?>
             <div class="portfolio-item">
-                <img src="<?php echo esc_url($prod_uri . $fn); ?>"
-                     alt="<?php echo esc_attr(trim($label)); ?> — Apex Engraving"
+                <img src="<?php echo esc_url( $prod_uri . $file ); ?>"
+                     alt="<?php echo esc_attr( $meta[1] ); ?> — Apex Coatings &amp; Engraving"
                      loading="lazy"
                      style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.5s ease;">
                 <div class="portfolio-overlay">
-                    <span class="portfolio-cat">Custom Work</span>
-                    <span class="portfolio-name"><?php echo esc_html(trim($label)); ?></span>
+                    <span class="portfolio-cat"><?php echo esc_html( $meta[0] ); ?></span>
+                    <span class="portfolio-name"><?php echo esc_html( $meta[1] ); ?></span>
                 </div>
             </div>
-            <?php $shown++; endforeach; endif; ?>
+            <?php endforeach; endif; ?>
         </div>
 
         <div class="text-center" style="margin-top:40px;">
@@ -615,5 +634,146 @@
         </div>
     </div>
 </section>
+
+<!-- ============================================================
+     PRODUCT DETAIL MODAL
+     Triggered by "View Details" on product cards.
+     Content is pulled from the product's WP post fields:
+       - Title → Product title
+       - Body  → Product post content (the editor)
+       - Price / Material / SKU → Product Details sidebar
+       - Image → Featured image
+     All editable via WP Admin → Products.
+     ============================================================ -->
+<div id="apex-product-modal"
+     style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:20px;box-sizing:border-box;"
+     onclick="if(event.target===this)apexCloseProductModal()">
+
+    <div style="background:#1a1a1a;border:1px solid rgba(245,131,31,0.22);border-top:3px solid var(--apex-orange);border-radius:10px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 32px 80px rgba(0,0,0,0.75);">
+
+        <!-- Close -->
+        <button onclick="apexCloseProductModal()"
+                aria-label="Close"
+                style="position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:2rem;cursor:pointer;line-height:1;z-index:1;transition:color 0.2s;"
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">&times;</button>
+
+        <!-- Image (hidden if no image) -->
+        <div id="apex-pm-img-wrap" style="border-radius:8px 8px 0 0;overflow:hidden;background:#111;max-height:300px;">
+            <img id="apex-pm-img" src="" alt="" loading="lazy"
+                 style="width:100%;max-height:300px;object-fit:cover;display:block;">
+        </div>
+
+        <!-- Details -->
+        <div style="padding:28px 32px 36px;">
+
+            <!-- Status + SKU row -->
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px;">
+                <span id="apex-pm-stock" style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:4px 14px;border-radius:50px;"></span>
+                <span id="apex-pm-sku"   style="font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;"></span>
+            </div>
+
+            <!-- Title -->
+            <h2 id="apex-pm-title"
+                style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.7rem,3.5vw,2.5rem);font-weight:900;text-transform:uppercase;color:var(--apex-white);line-height:1.05;margin:0 0 8px;letter-spacing:0.03em;padding-right:32px;"></h2>
+
+            <!-- Material -->
+            <p id="apex-pm-material"
+               style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--apex-orange);font-weight:700;margin:0 0 20px;"></p>
+
+            <!-- Price -->
+            <div id="apex-pm-price-wrap" style="margin-bottom:20px;display:flex;align-items:baseline;gap:8px;">
+                <span id="apex-pm-price"
+                      style="font-family:'Barlow Condensed',sans-serif;font-size:2.6rem;font-weight:900;color:var(--apex-orange);line-height:1;"></span>
+                <span style="font-size:0.88rem;color:rgba(255,255,255,0.38);">starting at</span>
+            </div>
+
+            <!-- Body -->
+            <div id="apex-pm-body"
+                 style="color:rgba(255,255,255,0.62);line-height:1.78;font-size:0.95rem;margin-bottom:28px;white-space:pre-line;border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;"></div>
+
+            <!-- Actions -->
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <a href="<?php echo esc_url( home_url('/contact') ); ?>"
+                   class="btn btn-primary"
+                   style="flex:1;min-width:160px;justify-content:center;">Request a Quote</a>
+                <button type="button"
+                        onclick="apexCloseProductModal()"
+                        class="btn btn-outline-dark"
+                        style="flex:1;min-width:120px;justify-content:center;border-color:rgba(255,255,255,0.18);color:rgba(255,255,255,0.55);">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    var m = document.getElementById('apex-product-modal');
+    if (m) document.documentElement.appendChild(m);
+})();
+
+function apexOpenProductModal(card) {
+    var title    = card.dataset.modalTitle    || '';
+    var body     = card.dataset.modalBody     || '';
+    var price    = card.dataset.modalPrice    || '';
+    var material = card.dataset.modalMaterial || '';
+    var img      = card.dataset.modalImg      || '';
+    var stock    = card.dataset.modalStock;
+    var sku      = card.dataset.modalSku      || '';
+
+    document.getElementById('apex-pm-title').textContent = title;
+    document.getElementById('apex-pm-body').textContent  = body;
+
+    var priceWrap = document.getElementById('apex-pm-price-wrap');
+    if (price) {
+        document.getElementById('apex-pm-price').textContent = '$' + parseFloat(price).toLocaleString();
+        priceWrap.style.display = 'flex';
+    } else {
+        priceWrap.style.display = 'none';
+    }
+
+    var matEl = document.getElementById('apex-pm-material');
+    matEl.textContent  = material;
+    matEl.style.display = material ? '' : 'none';
+
+    var skuEl = document.getElementById('apex-pm-sku');
+    skuEl.textContent  = sku ? 'SKU: ' + sku : '';
+    skuEl.style.display = sku ? '' : 'none';
+
+    var badge = document.getElementById('apex-pm-stock');
+    if (stock === '1') {
+        badge.textContent = 'Available';
+        badge.style.cssText = 'font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:4px 14px;border-radius:50px;color:#38a169;background:rgba(56,161,105,0.12);border:1px solid rgba(56,161,105,0.3);';
+    } else {
+        badge.textContent = 'Quote Required';
+        badge.style.cssText = 'font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:4px 14px;border-radius:50px;color:var(--apex-orange);background:rgba(245,131,31,0.1);border:1px solid rgba(245,131,31,0.3);';
+    }
+
+    var imgWrap = document.getElementById('apex-pm-img-wrap');
+    var imgEl   = document.getElementById('apex-pm-img');
+    if (img) {
+        imgEl.src = img;
+        imgEl.alt = title;
+        imgWrap.style.display = '';
+    } else {
+        imgWrap.style.display = 'none';
+    }
+
+    var modal = document.getElementById('apex-product-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function apexCloseProductModal() {
+    var modal = document.getElementById('apex-product-modal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+    document.getElementById('apex-pm-img').src = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') apexCloseProductModal();
+});
+</script>
 
 <?php get_footer(); ?>
